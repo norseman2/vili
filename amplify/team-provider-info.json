@@ -1,0 +1,15 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-vili-dev-191035-authRole",
+            "UnauthRoleArn": "arn:aws:iam::575704994123:role/amplify-vili-dev-191035-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::575704994123:role/amplify-vili-dev-191035-authRole",
+            "Region": "ca-central-1",
+            "DeploymentBucketName": "amplify-vili-dev-191035-deployment",
+            "UnauthRoleName": "amplify-vili-dev-191035-unauthRole",
+            "StackName": "amplify-vili-dev-191035",
+            "StackId": "arn:aws:cloudformation:ca-central-1:575704994123:stack/amplify-vili-dev-191035/d31c1160-e7cf-11ea-bc8a-0215dedd9148",
+            "AmplifyAppId": "d2vwzka5ivuplo"
+        }
+    }
+}

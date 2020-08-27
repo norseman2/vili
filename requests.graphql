@@ -1,0 +1,123 @@
+mutation addLoadProfile {
+  createLoadProfile(input: {
+    name: "Residential LP1"
+    description: "Electricity load profile residential 1"
+    unit: kW
+    type: ELECTRICITY,
+  }) {
+    id
+    name
+    description
+    unit
+    type
+  }
+}
+
+mutation addDataPoint1 {
+  createDataPoint(input:{
+    timestamp: "2020-06-10T03:40:00.000Z",
+	time: "03:40:00.000",
+	hour: 3,
+	minutes: 40,
+	value: 13.12,
+	unit: kW,
+    profileId: "69f06f42-a967-421e-b770-d6fba39cabe8"
+  }) {
+    id
+  }
+}
+
+mutation addDataPoint2 {
+  createDataPoint(input:{
+    timestamp: "2020-06-10T03:45:00.000Z",
+	time: "03:45:00.000",
+	hour: 3,
+	minutes: 45,
+	value: 13.14,
+	unit: kW,
+    profileId: "69f06f42-a967-421e-b770-d6fba39cabe8"
+  }) {
+    id
+  }
+}
+
+query listDataPoints  {
+  listDataPoints {
+    items {
+      id,
+      timestamp,
+      time,
+      hour,
+      minutes,
+      value,
+      unit
+    }
+  }
+}
+
+query listLoadProfiles {
+  listLoadProfiles {
+    items {
+      id,
+      name,
+      description,
+      unit,
+      type,
+      dataPoints {
+        items {
+          id,
+          timestamp,
+          value,
+          unit
+        }
+      }
+    }
+  }
+}
+
+mutation addSmartMeter {
+  createSmartMeter(input: {
+    name: "Residential 1"
+    description: "Residential electricity smart meter"
+    unit: kW
+    type: ELECTRICITY,
+	  profileId: "69f06f42-a967-421e-b770-d6fba39cabe8"
+  }) {
+    id
+    name
+    description
+    unit
+    type
+  }
+}
+
+query listSmartMeters {
+  listSmartMeters {
+    items {
+      id,
+      name,
+      description,
+      unit,
+      type,
+      profile {
+      	id,
+        dataPoints {
+          items {
+            id,
+            timestamp,
+            value,
+            unit
+          }
+        }
+    	}
+    }
+  }
+}
+
+mutation deleteDataPoint {
+  deleteDataPoint(input: {
+    id: "1d04d2c1-c81b-4ac4-adb4-d9b55b80562a"
+  }) {
+    id
+  }
+}

@@ -1,0 +1,50 @@
+type SmartMeter @model {
+  id: ID!
+  name: String!
+  description: String
+  unit: MeterUnit!
+  type: MeterType!
+  profile: LoadProfile @connection(name: "MeterLoadProfile", keyField: "profileId")
+}
+
+type LoadProfile @model {
+  id: ID!
+  name: String!
+  description: String
+  unit: MeterUnit!
+  type: MeterType!
+  meter: SmartMeter @connection(name: "MeterLoadProfile", keyField: "profileId")
+  dataPoints: [DataPoint] @connection(name: "LoadProfileDataPoints", keyField: "profileId")
+}
+
+type DataPoint @model {
+  id: ID!
+  profile: LoadProfile @connection(name: "LoadProfileDataPoints", keyField: "profileId")
+  timestamp: AWSDateTime!
+  time: AWSTime!
+  hour: Int!
+  minutes: Int!
+  value: Float!
+  unit: DataPointUnit!
+}
+
+enum MeterUnit {
+  kW
+  kWh
+  m3
+  celsius
+}
+
+enum MeterType {
+  ELECTRICITY
+  WATER
+  GAS
+  TEMPERATURE
+}
+
+enum DataPointUnit {
+  kW
+  kWh
+  m3
+  celsius
+}
