@@ -20,7 +20,9 @@ class Tsmk extends React.PureComponent {
 	}
 
 	handleClick(){
-		this.props.onLoadProfileChange($('#canvas').data['loadProfile'])
+		console.log(this.props.smartMeter)
+		const loadProfile = $('#canvas').data['loadProfile']
+		console.log('loadProfile',loadProfile)
 	}
 
 	componentDidMount() {
