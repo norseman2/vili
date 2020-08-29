@@ -25,9 +25,7 @@ export const getSmartMeter = /* GraphQL */ `
           createdAt
           updatedAt
         }
-        dataPoints {
-          nextToken
-        }
+        dataPoints
         createdAt
         updatedAt
       }
@@ -55,6 +53,7 @@ export const listSmartMeters = /* GraphQL */ `
           description
           unit
           type
+          dataPoints
           createdAt
           updatedAt
         }
@@ -85,26 +84,14 @@ export const getLoadProfile = /* GraphQL */ `
           description
           unit
           type
+          dataPoints
           createdAt
           updatedAt
         }
         createdAt
         updatedAt
       }
-      dataPoints {
-        items {
-          id
-          timestamp
-          time
-          hour
-          minutes
-          value
-          unit
-          createdAt
-          updatedAt
-        }
-        nextToken
-      }
+      dataPoints
       createdAt
       updatedAt
     }
@@ -132,9 +119,7 @@ export const listLoadProfiles = /* GraphQL */ `
           createdAt
           updatedAt
         }
-        dataPoints {
-          nextToken
-        }
+        dataPoints
         createdAt
         updatedAt
       }
@@ -146,27 +131,6 @@ export const getDataPoint = /* GraphQL */ `
   query GetDataPoint($id: ID!) {
     getDataPoint(id: $id) {
       id
-      profile {
-        id
-        name
-        description
-        unit
-        type
-        meter {
-          id
-          name
-          description
-          unit
-          type
-          createdAt
-          updatedAt
-        }
-        dataPoints {
-          nextToken
-        }
-        createdAt
-        updatedAt
-      }
       timestamp
       time
       hour
@@ -187,15 +151,6 @@ export const listDataPoints = /* GraphQL */ `
     listDataPoints(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        profile {
-          id
-          name
-          description
-          unit
-          type
-          createdAt
-          updatedAt
-        }
         timestamp
         time
         hour

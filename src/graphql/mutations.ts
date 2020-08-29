@@ -28,9 +28,7 @@ export const createSmartMeter = /* GraphQL */ `
           createdAt
           updatedAt
         }
-        dataPoints {
-          nextToken
-        }
+        dataPoints
         createdAt
         updatedAt
       }
@@ -65,9 +63,7 @@ export const updateSmartMeter = /* GraphQL */ `
           createdAt
           updatedAt
         }
-        dataPoints {
-          nextToken
-        }
+        dataPoints
         createdAt
         updatedAt
       }
@@ -102,9 +98,7 @@ export const deleteSmartMeter = /* GraphQL */ `
           createdAt
           updatedAt
         }
-        dataPoints {
-          nextToken
-        }
+        dataPoints
         createdAt
         updatedAt
       }
@@ -136,26 +130,14 @@ export const createLoadProfile = /* GraphQL */ `
           description
           unit
           type
+          dataPoints
           createdAt
           updatedAt
         }
         createdAt
         updatedAt
       }
-      dataPoints {
-        items {
-          id
-          timestamp
-          time
-          hour
-          minutes
-          value
-          unit
-          createdAt
-          updatedAt
-        }
-        nextToken
-      }
+      dataPoints
       createdAt
       updatedAt
     }
@@ -184,26 +166,14 @@ export const updateLoadProfile = /* GraphQL */ `
           description
           unit
           type
+          dataPoints
           createdAt
           updatedAt
         }
         createdAt
         updatedAt
       }
-      dataPoints {
-        items {
-          id
-          timestamp
-          time
-          hour
-          minutes
-          value
-          unit
-          createdAt
-          updatedAt
-        }
-        nextToken
-      }
+      dataPoints
       createdAt
       updatedAt
     }
@@ -232,26 +202,14 @@ export const deleteLoadProfile = /* GraphQL */ `
           description
           unit
           type
+          dataPoints
           createdAt
           updatedAt
         }
         createdAt
         updatedAt
       }
-      dataPoints {
-        items {
-          id
-          timestamp
-          time
-          hour
-          minutes
-          value
-          unit
-          createdAt
-          updatedAt
-        }
-        nextToken
-      }
+      dataPoints
       createdAt
       updatedAt
     }
@@ -264,27 +222,6 @@ export const createDataPoint = /* GraphQL */ `
   ) {
     createDataPoint(input: $input, condition: $condition) {
       id
-      profile {
-        id
-        name
-        description
-        unit
-        type
-        meter {
-          id
-          name
-          description
-          unit
-          type
-          createdAt
-          updatedAt
-        }
-        dataPoints {
-          nextToken
-        }
-        createdAt
-        updatedAt
-      }
       timestamp
       time
       hour
@@ -303,27 +240,6 @@ export const updateDataPoint = /* GraphQL */ `
   ) {
     updateDataPoint(input: $input, condition: $condition) {
       id
-      profile {
-        id
-        name
-        description
-        unit
-        type
-        meter {
-          id
-          name
-          description
-          unit
-          type
-          createdAt
-          updatedAt
-        }
-        dataPoints {
-          nextToken
-        }
-        createdAt
-        updatedAt
-      }
       timestamp
       time
       hour
@@ -342,27 +258,6 @@ export const deleteDataPoint = /* GraphQL */ `
   ) {
     deleteDataPoint(input: $input, condition: $condition) {
       id
-      profile {
-        id
-        name
-        description
-        unit
-        type
-        meter {
-          id
-          name
-          description
-          unit
-          type
-          createdAt
-          updatedAt
-        }
-        dataPoints {
-          nextToken
-        }
-        createdAt
-        updatedAt
-      }
       timestamp
       time
       hour

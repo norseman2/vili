@@ -14,12 +14,11 @@ type LoadProfile @model {
   unit: MeterUnit!
   type: MeterType!
   meter: SmartMeter @connection(name: "MeterLoadProfile", keyField: "profileId")
-  dataPoints: [DataPoint] @connection(name: "LoadProfileDataPoints", keyField: "profileId")
+  dataPoints: AWSJSON
 }
 
 type DataPoint @model {
   id: ID!
-  profile: LoadProfile @connection(name: "LoadProfileDataPoints", keyField: "profileId")
   timestamp: AWSDateTime!
   time: AWSTime!
   hour: Int!

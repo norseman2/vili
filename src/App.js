@@ -44,9 +44,7 @@ class App extends React.PureComponent {
 
   constructor(props) {
     super(props);
-    this.handleLoadProfileChange = this.handleLoadProfileChange.bind(this)
     this.state = {
-      loadProfile: [],
       smartMeterColumns : [
         {name:'name',title:'Name'},
         {name:'type',title:'Type'},
@@ -82,17 +80,12 @@ class App extends React.PureComponent {
     }
   } 
 
-  handleLoadProfileChange(loadProfile) {
-    console.log('handleLoadProfileChange',loadProfile)
-    this.setState({loadProfile})
-  }
-
   commitChanges = ({ changed }) => {
   };  
 
   render() {
 
-    const {loadProfile,smartMeterColumns,smartMeterRows} = this.state;
+    const {smartMeterColumns,smartMeterRows} = this.state;
 
     return (
       <Container className="p-3">

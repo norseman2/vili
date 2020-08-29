@@ -10,12 +10,7 @@ import * as d3 from 'd3';
 import { Button } from 'react-bootstrap';
 
 import { API, graphqlOperation } from 'aws-amplify'
-import { 
-	createDataPoint as CreateDataPoint, 
-	deleteDataPoint as DeleteDataPoint
-} from '../graphql/mutations'
-import { listDataPoints as ListDataPoints } from '../graphql/queries'
-import { DataPointUnit } from '../graphql/schema.json'
+import { updateLoadProfile as UpdateLoadProfile} from '../graphql/mutations';
 
 //https://www.npmjs.com/package/d3
 //https://github.com/mbonvini/TimeSeriesMaker
@@ -40,58 +35,21 @@ class Tsmk extends React.PureComponent {
 		return '2020-01-01T' + time + 'Z'
 	}
 
-	resetLoadProfile(profileId) {
-		return new Promise(resolve => { 
-			API.graphql(graphqlOperation(ListDataPoints)).then(
-				(result) => {
-					const dataPoints = result.data.listDataPoints.items;
-					dataPoints.forEach((item)=>{
-						API.graphql(graphqlOperation(DeleteDataPoint, {input: {'id': item.id}} )).then((response)=>{
-							//...
-						}).catch((err)=>{
-							console.log(err);
-						})
-					})
-					resolve(dataPoints.length + ' datapoints removed')
-				}
-			).catch( (err) => {
-				console.log(err)
-			})
-		})
-	}
-
-	fillLoadProfile(profileId,loadProfile){
-		loadProfile.forEach((item)=>{
-			const time = this.getTime(item)
-			const timestamp = this.getTimestamp(time)
-			const dataPoint = {
-				timestamp: timestamp,
-				time: time,
-				hour: item.hour,
-				minutes: item.minutes,
-				value: item.activePower,
-				unit: 'kW',
-				profileId: profileId
-			}
-			API.graphql(graphqlOperation(CreateDataPoint, { input: dataPoint })).then((response)=>{
-				//...
-			}).catch((err)=>{
-				console.log(err)
-			})
-		})
-		console.log(loadProfile.length,'datapoints added')
-	}
-
 	async handleClick(){
 		const smartMeter = this.props.smartMeter
 		const loadProfile = $('#canvas').data['loadProfile']
-		await this.resetLoadProfile(smartMeter.profile.id).then((response)=>{
+		console.log('loadProfile',loadProfile)
+		const jsonLoadProfile = JSON.stringify(loadProfile)
+		console.log('jsonLoadProfile',jsonLoadProfile)
+		const updates = {
+			id: smartMeter.profile.id,
+			dataPoints: jsonLoadProfile
+		}
+		await API.graphql(graphqlOperation(UpdateLoadProfile, { input: updates })).then((response)=>{
 			console.log(response)
-			this.fillLoadProfile(smartMeter.profile.id,loadProfile)
 		}).catch((err)=>{
 			console.log(err)
 		})
-
 	}
 
 	componentDidMount() {
