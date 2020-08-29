@@ -9,6 +9,14 @@ import $ from 'jquery';
 import * as d3 from 'd3';
 import { Button } from 'react-bootstrap';
 
+import { API, graphqlOperation } from 'aws-amplify'
+import { 
+	createDataPoint as CreateDataPoint, 
+	deleteDataPoint as DeleteDataPoint
+} from '../graphql/mutations'
+import { listDataPoints as ListDataPoints } from '../graphql/queries'
+import { DataPointUnit } from '../graphql/schema.json'
+
 //https://www.npmjs.com/package/d3
 //https://github.com/mbonvini/TimeSeriesMaker
 
@@ -19,10 +27,71 @@ class Tsmk extends React.PureComponent {
 		this.handleClick = this.handleClick.bind(this);
 	}
 
-	handleClick(){
-		console.log(this.props.smartMeter)
+	getTime(dataPoint) {
+		let time = (dataPoint.hour < 10)?'0'+dataPoint.hour:dataPoint.hour
+		time += ':'
+		time += (dataPoint.minutes < 10)?'0'+dataPoint.minutes:dataPoint.minutes
+		time += ':'
+		time += '00.000'
+		return time
+	}
+
+	getTimestamp(time){
+		return '2020-01-01T' + time + 'Z'
+	}
+
+	resetLoadProfile(profileId) {
+		return new Promise(resolve => { 
+			API.graphql(graphqlOperation(ListDataPoints)).then(
+				(result) => {
+					const dataPoints = result.data.listDataPoints.items;
+					dataPoints.forEach((item)=>{
+						API.graphql(graphqlOperation(DeleteDataPoint, {input: {'id': item.id}} )).then((response)=>{
+							//...
+						}).catch((err)=>{
+							console.log(err);
+						})
+					})
+					resolve(dataPoints.length + ' datapoints removed')
+				}
+			).catch( (err) => {
+				console.log(err)
+			})
+		})
+	}
+
+	fillLoadProfile(profileId,loadProfile){
+		loadProfile.forEach((item)=>{
+			const time = this.getTime(item)
+			const timestamp = this.getTimestamp(time)
+			const dataPoint = {
+				timestamp: timestamp,
+				time: time,
+				hour: item.hour,
+				minutes: item.minutes,
+				value: item.activePower,
+				unit: 'kW',
+				profileId: profileId
+			}
+			API.graphql(graphqlOperation(CreateDataPoint, { input: dataPoint })).then((response)=>{
+				//...
+			}).catch((err)=>{
+				console.log(err)
+			})
+		})
+		console.log(loadProfile.length,'datapoints added')
+	}
+
+	async handleClick(){
+		const smartMeter = this.props.smartMeter
 		const loadProfile = $('#canvas').data['loadProfile']
-		console.log('loadProfile',loadProfile)
+		await this.resetLoadProfile(smartMeter.profile.id).then((response)=>{
+			console.log(response)
+			this.fillLoadProfile(smartMeter.profile.id,loadProfile)
+		}).catch((err)=>{
+			console.log(err)
+		})
+
 	}
 
 	componentDidMount() {
@@ -189,8 +258,8 @@ class Tsmk extends React.PureComponent {
 				dataPoints.forEach(element => {
 					var time = (element[0] * xMaxValue) / width
 					var hour = parseInt((Math.floor(time)<10)?'0'+Math.floor(time):Math.floor(time))
-					var minutes = Math.round((time - Math.floor(time)) * 60,2)
-					var activePower = Math.round(100 - (element[1] * yMaxValue) / height,2)
+					var minutes = Math.round((time - Math.floor(time)) * 60)
+					var activePower = (100 - (element[1] * yMaxValue) / height).toFixed(2)
 					loadProfile.push(
 						{
 							time: time,
