@@ -9,19 +9,8 @@ import Accordion from 'react-bootstrap/Accordion';
 import Modal from 'react-bootstrap/Modal';
 //devexpress grid
 import Paper from '@material-ui/core/Paper';
-import { Grid, Table, TableHeaderRow,TableRowDetail } from '@devexpress/dx-react-grid-material-ui';
+import { Grid, Table, TableHeaderRow,TableRowDetail, TableEditColumn, TableEditRow } from '@devexpress/dx-react-grid-material-ui';
 import { EditingState, RowDetailState } from '@devexpress/dx-react-grid';
-import MuiGrid from '@material-ui/core/Grid';
-import FormGroup from '@material-ui/core/FormGroup';
-import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
 import TableCell from '@material-ui/core/TableCell';
 import IconButton from '@material-ui/core/IconButton';
 import Edit from '@material-ui/icons/Edit';
@@ -34,11 +23,17 @@ import { withStyles } from '@material-ui/core/styles';
 //END devexpress grid
 
 import Tsmk from './components/Tsmk';
-import SmartMeters from './components/electricity/SmartMeters';
-
 
 import { API, graphqlOperation } from 'aws-amplify'
 import { listSmartMeters as ListSmartMeters } from './graphql/queries'
+import { 
+  createSmartMeter as CreateSmartMeter, 
+  createLoadProfile as CreateLoadProfile,
+  updateSmartMeter as UpdateSmartMeter,
+  deleteSmartMeter as DeleteSmartMeter,
+  deleteLoadProfile as DeleteLoadProfile
+} from './graphql/mutations'
+
 
 class App extends React.PureComponent {
 
@@ -48,9 +43,11 @@ class App extends React.PureComponent {
       smartMeterColumns : [
         {name:'name',title:'Name'},
         {name:'type',title:'Type'},
-        {name:'unit',title:'Unit'}
+        {name:'unit',title:'Unit'},
+        {name:'description',title:'Description'}
       ],
-      smartMeterRows: []
+      smartMeterRows: [],
+      addedRows: []
     };
   }
 
@@ -67,7 +64,6 @@ class App extends React.PureComponent {
       await API.graphql(graphqlOperation(ListSmartMeters)).then(
         (result) => {
           const smartMeters = result.data.listSmartMeters.items;
-          console.log('smartMeters',smartMeters)
           this.setState({
             smartMeterRows: smartMeters
           })
@@ -80,23 +76,185 @@ class App extends React.PureComponent {
     }
   } 
 
-  commitChanges = ({ changed }) => {
-  };  
+  getLoadProfileName(smartMeter){
+    return smartMeter.type + ' load profile ' + smartMeter.name;
+  }
+
+  getLoadProfileDescription(smartMeter){
+    return smartMeter.type + ' load profile ' + smartMeter.name + ' with unit ' + smartMeter.unit;
+  }
+
+  addSmartMeter = (added) => {
+    let p = new Promise(function(resolve,reject){
+      if(added.length > 0) {
+        const smartMeterProps = added[0]
+        const smartMeter = {
+          name: smartMeterProps.name,
+          unit: smartMeterProps.unit,
+          type: smartMeterProps.type,
+          description: smartMeterProps.description
+        }
+        API.graphql(graphqlOperation(CreateSmartMeter, { input: smartMeter })).then( (response) => {
+          console.log('meter added')
+          const addedSmartMeter = response.data.createSmartMeter;
+          const loadProfile = {
+            name: addedSmartMeter.type + ' load profile ' + addedSmartMeter.name,
+            description: addedSmartMeter.type + ' load profile ' + addedSmartMeter.name + ' with unit ' + addedSmartMeter.unit,
+            unit: addedSmartMeter.unit,
+            type: addedSmartMeter.type,
+            meterId: addedSmartMeter.id
+          }
+          API.graphql(graphqlOperation(CreateLoadProfile, { input: loadProfile })).then( (response) => {
+              console.log('profile added')
+              const profileId = response.data.createLoadProfile.id
+              const smartMeterId = response.data.createLoadProfile.meter.id
+              const updates = {
+                id:smartMeterId,
+                meterId: profileId
+              }
+              API.graphql(graphqlOperation(UpdateSmartMeter, { input: updates})).then( (response) => {
+                console.log('meter linked to profile')
+                resolve(response.data.updateSmartMeter)
+              }).catch((err)=>{
+                console.log(err)
+                reject('failed to update new smart meter (profileId)');
+              })
+          }).catch((err)=>{
+            console.log(err)
+            reject('failed to add load profile for new smart meter');
+          })
+        }).catch((err)=>{
+          console.log(err)
+          reject('failed to add smart meter')
+        })
+      } else {
+        console.log('added',added)
+        reject('nothing to add (empty added)')
+      }
+    })
+    return p
+  }
+
+  updateSmartMeter = (changed) => {
+    let p = new Promise(function(resolve,reject){
+      try {
+        const smartMeterId = Object.keys(changed)[0]
+        const updates = {
+          id: smartMeterId,
+          ...changed[smartMeterId]
+        }
+        API.graphql(graphqlOperation(UpdateSmartMeter, { input: updates})).then( (response) => {
+          console.log('smart meter updated')
+          resolve(response.data.updateSmartMeter)
+        }).catch((err)=>{
+          console.log(err)
+          reject('failed to update smart meter');
+        })        
+      } catch(err) {
+        reject(err);
+      }
+    })
+    return p
+  }
+
+  deleteSmartMeter = (deleted) => {
+    let { smartMeterRows } = this.state;
+    let p = new Promise(function(resolve,reject){
+      try {
+        const smartMeterId = deleted[0]
+        const deleteSmartMeterInput = {
+          id: smartMeterId
+        }
+        let deleteLoadProfileInput = {}
+        smartMeterRows.map((smartMeter)=>{
+            if(smartMeter.id == smartMeterId) {
+              deleteLoadProfileInput['id'] = smartMeter.profile.id
+            }
+        })
+        API.graphql(graphqlOperation(DeleteLoadProfile, { input: deleteLoadProfileInput})).then( (response) => {
+          console.log('load profile deleted')
+          API.graphql(graphqlOperation(DeleteSmartMeter, { input: deleteSmartMeterInput})).then( (response) => {
+            console.log('smart meter deleted')
+            resolve(response.data.deleteSmartMeter)
+          }).catch((err)=>{
+            console.log(err)
+            reject('failed to delete smart meter');
+          })
+        }).catch((err)=>{
+          console.log(err)
+          reject('failed to delete load profile');
+        })
+      } catch(err) {
+        reject(err);
+      }
+    })
+    return p
+  }    
+
+  commitChanges = ({ added, changed, deleted }) => {
+
+      let { smartMeterRows } = this.state;
+      if (added) {
+        this.addSmartMeter(added).then((response)=>{
+          const startingAddedId = smartMeterRows.length > 0 ? smartMeterRows[smartMeterRows.length - 1].id + 1 : 0;
+          this.setState({
+            smartMeterRows: [...smartMeterRows, { id: startingAddedId, ...response }]
+          })
+        }).catch((err)=>{
+          console.log(err)
+        })
+      }
+      if (changed) {
+        this.updateSmartMeter(changed).then((response)=>{
+          const rows = smartMeterRows.map(smartMeter => (
+            (response.id == smartMeter.id) ? { ...smartMeter, ...response } : smartMeter
+          ))
+          this.setState({
+            smartMeterRows: rows
+          })
+        }).catch((err)=>{
+          console.log(err)
+        })
+      }
+      if (deleted !== undefined) {
+        this.deleteSmartMeter(deleted).then((response)=>{
+          this.setState({
+            smartMeterRows: smartMeterRows.filter(smartMeter => smartMeter.id !== response.id)
+          })          
+        }).catch((err)=>{
+          console.log(err)
+        })
+      }
+
+  };
+
+  changeAddedRows = (value) => {
+    const initialized = value.map(row => (Object.keys(row).length ? row : { 
+      name: 'Residential 001',
+      unit: 'kW',
+      type: 'ELECTRICITY',
+      description: 'electricity smart meter'
+    }));
+    console.log('initialized',initialized)
+    this.setState({
+      addedRows: initialized
+    })
+  };
 
   render() {
 
-    const {smartMeterColumns,smartMeterRows} = this.state;
+    const {smartMeterColumns,smartMeterRows,addedRows} = this.state;
 
     return (
       <Container className="p-3">
         <Jumbotron style={{backgroundColor:'#607d8b'}}>
-          <h1 className="header">Smart City</h1>
+          <h1 className="header">Electricity GRID</h1>
         </Jumbotron>
         <Accordion defaultActiveKey="0">
           <Card>
             <Card.Header>
               <Accordion.Toggle as={Button} variant="link" eventKey="0">
-                Electricity GRID
+                Smart Meters
               </Accordion.Toggle>
             </Card.Header>
             <Accordion.Collapse eventKey="0">
@@ -113,6 +271,8 @@ class App extends React.PureComponent {
                     <EditingState
                       defaultEditingRowIds={[1]}
                       onCommitChanges={this.commitChanges}
+                      addedRows={addedRows}
+                      onAddedRowsChange={this.changeAddedRows}
                     />
                     <Table />
                     <TableHeaderRow />
@@ -120,6 +280,11 @@ class App extends React.PureComponent {
                       contentComponent={DetailContent}
                       cellComponent={DetailCell}
                       toggleCellComponent={ToggleCell}
+                    />
+                    <TableEditRow />
+                    <TableEditColumn 
+                      showAddCommand={!addedRows.length}
+                      showDeleteCommand
                     />
                     <DetailEditCell />
                   </Grid>
@@ -130,24 +295,28 @@ class App extends React.PureComponent {
           <Card>
             <Card.Header>
               <Accordion.Toggle as={Button} variant="link" eventKey="1">
-                Traffic
+              Network Operations Center
               </Accordion.Toggle>
             </Card.Header>
             <Accordion.Collapse eventKey="1">
               <Card.Body>
-                <p>Cars, Trucks... mouvements</p>
+                <p>A command hub that tracks grid conditions, weather patterns, stock market fluctuations, 
+                  and other factors that challenge electric supply across the country. It maintain a 
+                  constant view on the many factors that shape our electric world so they can work with demand response (DR) 
+                  customers to scale back on consumption. That means 24/7 activation, 365 days a year—the NOC is standing by to 
+                  make sure organizations are able to stay online when energy or emergency situations come up.</p>
               </Card.Body>
             </Accordion.Collapse>
           </Card>
           <Card>
             <Card.Header>
               <Accordion.Toggle as={Button} variant="link" eventKey="2">
-                Security
+                Weather
               </Accordion.Toggle>
             </Card.Header>
             <Accordion.Collapse eventKey="2">
               <Card.Body>
-                <p>Data coming from Toronto Police API...</p>
+                <p>Weather patterns that challenge electric supply across the grid</p>
               </Card.Body>
             </Accordion.Collapse>
           </Card>

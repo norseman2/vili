@@ -38,15 +38,13 @@ class Tsmk extends React.PureComponent {
 	async handleClick(){
 		const smartMeter = this.props.smartMeter
 		const loadProfile = $('#canvas').data['loadProfile']
-		console.log('loadProfile',loadProfile)
 		const jsonLoadProfile = JSON.stringify(loadProfile)
-		console.log('jsonLoadProfile',jsonLoadProfile)
 		const updates = {
 			id: smartMeter.profile.id,
 			dataPoints: jsonLoadProfile
 		}
 		await API.graphql(graphqlOperation(UpdateLoadProfile, { input: updates })).then((response)=>{
-			console.log(response)
+			console.log('load profile saved')
 		}).catch((err)=>{
 			console.log(err)
 		})

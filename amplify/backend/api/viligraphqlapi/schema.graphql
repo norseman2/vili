@@ -4,7 +4,7 @@ type SmartMeter @model {
   description: String
   unit: MeterUnit!
   type: MeterType!
-  profile: LoadProfile @connection(name: "MeterLoadProfile", keyField: "profileId")
+  profile: LoadProfile @connection(name: "MeterLoadProfile", keyField: "meterId")
 }
 
 type LoadProfile @model {
@@ -13,7 +13,7 @@ type LoadProfile @model {
   description: String
   unit: MeterUnit!
   type: MeterType!
-  meter: SmartMeter @connection(name: "MeterLoadProfile", keyField: "profileId")
+  meter: SmartMeter! @connection(name: "MeterLoadProfile", keyField: "meterId")
   dataPoints: AWSJSON
 }
 
