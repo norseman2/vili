@@ -1,6 +1,9 @@
 'use strict';
+const { v4: uuidv4 } = require('uuid');
 const AWS = require('aws-sdk');
+const { data } = require('jquery');
 const docClient = new AWS.DynamoDB.DocumentClient({region:'ca-central-1'});
+const kinesis = new AWS.Kinesis();
 
 function createResponse(statusCode,message){
   const response = {
@@ -8,6 +11,21 @@ function createResponse(statusCode,message){
     body: JSON.stringify(message)
   };
   return response;
+}
+
+async function getSmartMeters() {
+  const params = {
+    TableName: 'SmartMeter-wtvzpchf4ndhxn6vxdocqkieb4-dev'
+  }
+  return await docClient.scan(params).promise()
+}
+
+function getSmartMeter(smartMeters,meterId) {
+  for(var idx=0; idx < smartMeters.length; idx++){
+    let smartMeter = smartMeters[idx]
+    if(smartMeter.id == meterId) return smartMeter
+  }
+  return {}
 }
 
 module.exports.electricityConsumption = async event => {
@@ -18,43 +36,46 @@ module.exports.electricityConsumption = async event => {
 
   try {
 
+    let smartMeters = []
+    await getSmartMeters().then( (result) => {
+      smartMeters = result['Items']
+    }).catch( (err) => {
+      throw err
+    })
+
     const now = new Date(Date.now())
-    console.log('now',now)
-    const result = await docClient.scan(scanParams).promise()
-    const loadProfiles = result['Items']
+    const dynamoResponse = await docClient.scan(scanParams).promise()
+    const loadProfiles = dynamoResponse['Items']
     loadProfiles.map( async (loadProfile)=>{
+      const smartMeter = getSmartMeter(smartMeters,loadProfile['meterId'])
       let dataPoints = loadProfile['dataPoints']
-      console.log(dataPoints)
       for(var idx=0; idx < dataPoints.length; idx++){
         let dataPoint = dataPoints[idx]
         if(dataPoint['hour']==now.getHours()) {
           if(dataPoint['minutes']>=now.getMinutes()) {
-            console.log('found dataPoint',dataPoint)
             let activePower = {
+              eventId: uuidv4(),
+              meterId: smartMeter['id'],
+              meterName: smartMeter['name'],
+              meterType: smartMeter['type'],
+              profileId: smartMeter['meterId'],
               timestamp: now.toISOString(),
-              activePower: dataPoint['activePower']
+              measure: dataPoint['activePower'],
+              unit: loadProfile['unit']
             }
-            console.log(activePower)
+            let electricityEvent = {
+              Data: JSON.stringify(activePower),
+              PartitionKey: activePower['eventId'],
+              StreamName: 'energy-consumption-events'
+            }
+            let kinesisResponse = await kinesis.putRecord(electricityEvent).promise();
+            console.log('kinesisResult',kinesisResponse)
             break
           }
         }
       }
-      /*
-      dataPoints.map( (dataPoint) => {
-        if(dataPoint['hour']==now.getHours()) {
-          if(dataPoint['minutes']>=now.getMinutes()) {
-            console.log('found dataPoint',dataPoint)
-            let activePower = {
-              timestamp: now.toISOString(),
-              activePower: dataPoint['activePower']
-            }
-            console.log(activePower)
-            return true
-          }
-        }
-      })
-      */
     })
+
     return {
       statusCode: 200,
       body: JSON.stringify("success")

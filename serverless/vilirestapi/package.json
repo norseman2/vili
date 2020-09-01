@@ -1,0 +1,19 @@
+{
+	"name": "vilirestapi",
+	"version": "1.0.0",
+	"description": "",
+	"main": "handler.js",
+	"dependencies": {
+		"jquery": "^3.5.1",
+		"serverless": "^1.76.1",
+		"serverless-pseudo-parameters": "^2.5.0",
+		"uuid": "^8.2.0"
+	},
+	"devDependencies": {},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "Fred Ory",
+	"license": "ISC"
+}
