@@ -1,0 +1,16 @@
+service: vilirestapi
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ca-central-1
+  apiKeys:
+    - ${opt:stage}-vilirestapikey
+
+functions:
+  electricityConsumption:
+    handler: handler.electricityConsumption
+    events:
+      - http:
+          path: /electricityconsumption
+          method: post
