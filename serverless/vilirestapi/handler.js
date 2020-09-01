@@ -47,32 +47,36 @@ module.exports.electricityConsumption = async event => {
     const dynamoResponse = await docClient.scan(scanParams).promise()
     const loadProfiles = dynamoResponse['Items']
     loadProfiles.map( async (loadProfile)=>{
-      const smartMeter = getSmartMeter(smartMeters,loadProfile['meterId'])
-      let dataPoints = loadProfile['dataPoints']
-      for(var idx=0; idx < dataPoints.length; idx++){
-        let dataPoint = dataPoints[idx]
-        if(dataPoint['hour']==now.getHours()) {
-          if(dataPoint['minutes']>=now.getMinutes()) {
-            let activePower = {
-              eventId: uuidv4(),
-              meterId: smartMeter['id'],
-              meterName: smartMeter['name'],
-              meterType: smartMeter['type'],
-              profileId: smartMeter['meterId'],
-              timestamp: now.toISOString(),
-              measure: dataPoint['activePower'],
-              unit: loadProfile['unit']
+      try {
+        let dataPoints = loadProfile['dataPoints']
+        const smartMeter = getSmartMeter(smartMeters,loadProfile['meterId'])
+        for(var idx=0; idx < dataPoints.length; idx++){
+          let dataPoint = dataPoints[idx]
+          if(dataPoint['hour']==now.getHours()) {
+            if(dataPoint['minutes']>=now.getMinutes()) {
+              let activePower = {
+                eventId: uuidv4(),
+                meterId: smartMeter['id'],
+                meterName: smartMeter['name'],
+                meterType: smartMeter['type'],
+                profileId: smartMeter['meterId'],
+                timestamp: now.toISOString(),
+                measure: dataPoint['activePower'],
+                unit: loadProfile['unit']
+              }
+              let electricityEvent = {
+                Data: JSON.stringify(activePower),
+                PartitionKey: activePower['eventId'],
+                StreamName: 'energy-consumption-events'
+              }
+              let kinesisResponse = await kinesis.putRecord(electricityEvent).promise();
+              console.log('kinesisResult',kinesisResponse)
+              break
             }
-            let electricityEvent = {
-              Data: JSON.stringify(activePower),
-              PartitionKey: activePower['eventId'],
-              StreamName: 'energy-consumption-events'
-            }
-            let kinesisResponse = await kinesis.putRecord(electricityEvent).promise();
-            console.log('kinesisResult',kinesisResponse)
-            break
           }
         }
+      } catch(err) {
+        console.log('empty load profile',loadProfile['id'])
       }
     })
 
