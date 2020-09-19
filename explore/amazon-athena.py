@@ -66,7 +66,7 @@ athena = boto3.client(
 resultfile = exportElectricityConsumption()
 if(resultfile != None):
 	exportfile = 'athena/staging/' + resultfile
-	archivefile = 'forecast/archives/vili-electricity-consumption-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '.csv'
-	electricityfile = 'forecast/vili-electricity-consumption.csv'
+	archivefile = 'spark/archives/vili-electricity-consumption-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '-UTC.csv'
+	electricityfile = 'spark/vili-electricity-consumption.csv'
 	moveS3Object(electricityfile, archivefile)
 	moveS3Object(exportfile, electricityfile)

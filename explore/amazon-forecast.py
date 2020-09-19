@@ -9,8 +9,6 @@ vili_ds_arn = 'arn:aws:forecast:us-east-2:575704994123:dataset/vili_electricity_
 vili_iam_role = 'arn:aws:iam::575704994123:role/service-role/AmazonForecast-ExecutionRole-1599914820409'
 vili_csv_file = 's3://vili-bucket/forecast/vili-electricity-consumption.csv'
 
-#vili_dsg = forecast.describe_dataset_group(DatasetGroupArn=vili_dsg_arn)
-
 schema = {
 	"Attributes": [
 		{
