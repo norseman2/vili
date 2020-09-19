@@ -1,1 +1,0 @@
-aws s3 cp s3://vili-bucket/forecast/vili-electricity-consumption.csv .
