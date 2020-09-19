@@ -2,7 +2,7 @@ import boto3
 import shutil
 from datetime import datetime
 
-import pyspark.sql.types import *
+from pyspark.sql.types import *
 
 s3_source='spark/vili-electricity-consumption.csv'
 spark_in='/home/hadoop/data/in/vili-electricity-consumption.csv'
