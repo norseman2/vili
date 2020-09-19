@@ -58,7 +58,8 @@ except:
 #write spark dataframe to a csv file
 #df.write.format("csv").save(spark_out)
 shutil.rmtree(spark_out)
-df.repartition(1).write.csv(spark_out)
+response = df.repartition(1).write.csv(spark_out)
+print(response)
 #copy previous amazon forecast S3 file
 #copyS3Object(s3_target,s3_archive)
 #push file to S3 for amazon forecast
