@@ -9,7 +9,7 @@ bucket = 'vili-bucket'
 s3_source='spark/vili-electricity-consumption.csv'
 spark_in='/home/hadoop/data/in/vili-electricity-consumption.csv'
 archive_in='/home/hadoop/data/archives/in/vili-electricity-consumption-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '-UTC.csv'
-spark_out='/home/hadoop/data/out/vili-electricity-consumption.csv'
+spark_out='/home/hadoop/data/out/'
 archive_out='/home/hadoop/data/archives/out/vili-electricity-consumption-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '-UTC.csv'
 s3_archive='forecast/archives/vili-electricity-consumption-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '-UTC.csv'
 s3_target='forecast/vili-electricity-consumption.csv'
@@ -51,12 +51,13 @@ df = spark.read.csv(spark_in, header=True, schema=schema)
 
 #archive previous spark output file
 try:
-	shutil.move(spark_out,archive_out)
+	#shutil.move(spark_out,archive_out)
+	pass
 except:
 	pass
 #write spark dataframe to a csv file
 df.write.format("csv").save(spark_out)
 #copy previous amazon forecast S3 file
-copyS3Object(s3_target,s3_archive)
+#copyS3Object(s3_target,s3_archive)
 #push file to S3 for amazon forecast
-moveS3Object(spark_out,s3_target)
+#moveS3Object(spark_out,s3_target)
