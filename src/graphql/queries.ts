@@ -10,6 +10,7 @@ export const getSmartMeter = /* GraphQL */ `
       description
       unit
       type
+      role
       profile {
         id
         name
@@ -22,6 +23,7 @@ export const getSmartMeter = /* GraphQL */ `
           description
           unit
           type
+          role
           createdAt
           updatedAt
         }
@@ -47,6 +49,7 @@ export const listSmartMeters = /* GraphQL */ `
         description
         unit
         type
+        role
         profile {
           id
           name
@@ -78,6 +81,7 @@ export const getLoadProfile = /* GraphQL */ `
         description
         unit
         type
+        role
         profile {
           id
           name
@@ -116,6 +120,7 @@ export const listLoadProfiles = /* GraphQL */ `
           description
           unit
           type
+          role
           createdAt
           updatedAt
         }

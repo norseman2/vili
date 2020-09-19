@@ -19,6 +19,9 @@ class Tsmk extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
+		this.state = {
+			currentDataPoints: this.props.smartMeter.profile.dataPoints
+		}
 		this.handleClick = this.handleClick.bind(this);
 	}
 
@@ -52,6 +55,9 @@ class Tsmk extends React.PureComponent {
 
 	componentDidMount() {
 
+		let { currentDataPoints } = this.state
+		currentDataPoints = JSON.parse(this.state.currentDataPoints)
+
 		var xMaxValue = 24; //Hours for a day
 		var yMaxValue = 100; //maximum value for active power in kW
 
@@ -80,7 +86,11 @@ class Tsmk extends React.PureComponent {
 				.attr("transform", 
 				"translate(" + margin.left + "," + margin.top + ")");
 
-			var line = d3.line();
+			var line = d3.line()
+
+			var currentLine = d3.line()
+				.x(function(d) { return (( d.time * width) / xMaxValue) })
+				.y(function(d) { return height - (( d.activePower * height) / yMaxValue) })
 
 			// Add the rectangle where the data will be drawn
 			svg.append("rect")
@@ -114,6 +124,15 @@ class Tsmk extends React.PureComponent {
 				.attr("stroke", "black")
 				.text("Active Power (kW)")
 				.attr("font-size", "12px")
+
+			if(currentDataPoints) {
+				svg.append("path")
+					.datum(currentDataPoints)
+					.attr("fill", "none")
+					.attr("stroke", "steelblue")
+					.attr("stroke-width", 1.5)
+					.attr("d", currentLine)
+			}
 
 			// Define the Object that will contain the data to draw
 			// the line
@@ -243,7 +262,7 @@ class Tsmk extends React.PureComponent {
 				<Row>
 					<Col>
 						<div id="canvas" />
-						<Button onClick={this.handleClick}>save load profile</Button>
+						<Button onClick={this.handleClick}>SAVE</Button>
 					</Col>
 				</Row>
 			</Container>

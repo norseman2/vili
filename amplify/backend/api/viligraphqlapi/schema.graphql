@@ -4,6 +4,7 @@ type SmartMeter @model {
   description: String
   unit: MeterUnit!
   type: MeterType!
+  role: String
   profile: LoadProfile @connection(name: "MeterLoadProfile", keyField: "meterId")
 }
 

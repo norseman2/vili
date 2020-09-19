@@ -29,6 +29,7 @@ export declare class SmartMeter {
   readonly description?: string;
   readonly unit: MeterUnit | keyof typeof MeterUnit;
   readonly type: MeterType | keyof typeof MeterType;
+  readonly role?: string;
   readonly profile?: LoadProfile;
   constructor(init: ModelInit<SmartMeter>);
   static copyOf(source: SmartMeter, mutator: (draft: MutableModel<SmartMeter>) => MutableModel<SmartMeter> | void): SmartMeter;

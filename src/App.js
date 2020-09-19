@@ -9,8 +9,24 @@ import Accordion from 'react-bootstrap/Accordion';
 import Modal from 'react-bootstrap/Modal';
 //devexpress grid
 import Paper from '@material-ui/core/Paper';
-import { Grid, Table, TableHeaderRow,TableRowDetail, TableEditColumn, TableEditRow } from '@devexpress/dx-react-grid-material-ui';
-import { EditingState, RowDetailState } from '@devexpress/dx-react-grid';
+import { 
+  Grid, 
+  Table, 
+  TableHeaderRow,
+  TableRowDetail, 
+  TableEditColumn, 
+  TableEditRow,
+  Toolbar,
+  SearchPanel
+} from '@devexpress/dx-react-grid-material-ui';
+import { 
+  EditingState, 
+  RowDetailState,
+  SortingState,
+  IntegratedSorting,
+  SearchState,
+  IntegratedFiltering
+} from '@devexpress/dx-react-grid';
 import TableCell from '@material-ui/core/TableCell';
 import IconButton from '@material-ui/core/IconButton';
 import Edit from '@material-ui/icons/Edit';
@@ -42,6 +58,7 @@ class App extends React.PureComponent {
     this.state = {
       smartMeterColumns : [
         {name:'name',title:'Name'},
+        {name:'role',title:'Role'},
         {name:'type',title:'Type'},
         {name:'unit',title:'Unit'},
         {name:'description',title:'Description'}
@@ -90,6 +107,7 @@ class App extends React.PureComponent {
         const smartMeterProps = added[0]
         const smartMeter = {
           name: smartMeterProps.name,
+          role: smartMeterProps.role,
           unit: smartMeterProps.unit,
           type: smartMeterProps.type,
           description: smartMeterProps.description
@@ -99,6 +117,7 @@ class App extends React.PureComponent {
           const addedSmartMeter = response.data.createSmartMeter;
           const loadProfile = {
             name: addedSmartMeter.type + ' load profile ' + addedSmartMeter.name,
+            //role: addedSmartMeter.role,
             description: addedSmartMeter.type + ' load profile ' + addedSmartMeter.name + ' with unit ' + addedSmartMeter.unit,
             unit: addedSmartMeter.unit,
             type: addedSmartMeter.type,
@@ -168,7 +187,11 @@ class App extends React.PureComponent {
         let deleteLoadProfileInput = {}
         smartMeterRows.map((smartMeter)=>{
             if(smartMeter.id == smartMeterId) {
-              deleteLoadProfileInput['id'] = smartMeter.profile.id
+              if(smartMeter.profile) {
+                deleteLoadProfileInput['id'] = smartMeter.profile.id
+              } else {
+                deleteLoadProfileInput['id'] = 0
+              }
             }
         })
         API.graphql(graphqlOperation(DeleteLoadProfile, { input: deleteLoadProfileInput})).then( (response) => {
@@ -231,6 +254,7 @@ class App extends React.PureComponent {
   changeAddedRows = (value) => {
     const initialized = value.map(row => (Object.keys(row).length ? row : { 
       name: 'Residential 001',
+      role: 'CONSUMER',
       unit: 'kW',
       type: 'ELECTRICITY',
       description: 'electricity smart meter'
@@ -265,6 +289,7 @@ class App extends React.PureComponent {
                     columns={smartMeterColumns}
                     getRowId={getRowId}
                   >
+                    <SearchState defaultValue="" />
                     <RowDetailState
                       defaultExpandedRowIds={[1]}
                     />
@@ -274,8 +299,15 @@ class App extends React.PureComponent {
                       addedRows={addedRows}
                       onAddedRowsChange={this.changeAddedRows}
                     />
+                    <SortingState
+                      defaultSorting={[{ columnName: 'name', direction: 'asc' }]}
+                    />
+                    <IntegratedSorting />
+                    <IntegratedFiltering />
                     <Table />
-                    <TableHeaderRow />
+                    <TableHeaderRow showSortingControls />
+                    <Toolbar />
+                    <SearchPanel />
                     <TableRowDetail
                       contentComponent={DetailContent}
                       cellComponent={DetailCell}
@@ -289,34 +321,6 @@ class App extends React.PureComponent {
                     <DetailEditCell />
                   </Grid>
                 </Paper>
-              </Card.Body>
-            </Accordion.Collapse>
-          </Card>
-          <Card>
-            <Card.Header>
-              <Accordion.Toggle as={Button} variant="link" eventKey="1">
-              Network Operations Center
-              </Accordion.Toggle>
-            </Card.Header>
-            <Accordion.Collapse eventKey="1">
-              <Card.Body>
-                <p>A command hub that tracks grid conditions, weather patterns, stock market fluctuations, 
-                  and other factors that challenge electric supply across the country. It maintain a 
-                  constant view on the many factors that shape our electric world so they can work with demand response (DR) 
-                  customers to scale back on consumption. That means 24/7 activation, 365 days a year—the NOC is standing by to 
-                  make sure organizations are able to stay online when energy or emergency situations come up.</p>
-              </Card.Body>
-            </Accordion.Collapse>
-          </Card>
-          <Card>
-            <Card.Header>
-              <Accordion.Toggle as={Button} variant="link" eventKey="2">
-                Weather
-              </Accordion.Toggle>
-            </Card.Header>
-            <Accordion.Collapse eventKey="2">
-              <Card.Body>
-                <p>Weather patterns that challenge electric supply across the grid</p>
               </Card.Body>
             </Accordion.Collapse>
           </Card>

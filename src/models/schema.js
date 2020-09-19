@@ -42,6 +42,13 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "role": {
+                    "name": "role",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "profile": {
                     "name": "profile",
                     "isArray": false,
@@ -232,5 +239,5 @@ export const schema = {
         }
     },
     "nonModels": {},
-    "version": "d6e2ac4ac737bc851495dd63742f5544"
+    "version": "3ad2d6abe30cde5c14625bce438421e2"
 };

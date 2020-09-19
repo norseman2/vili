@@ -8,6 +8,7 @@ export type CreateSmartMeterInput = {
   description?: string | null,
   unit: MeterUnit,
   type: MeterType,
+  role?: string | null,
   meterId?: string | null,
 };
 
@@ -32,6 +33,7 @@ export type ModelSmartMeterConditionInput = {
   description?: ModelStringInput | null,
   unit?: ModelMeterUnitInput | null,
   type?: ModelMeterTypeInput | null,
+  role?: ModelStringInput | null,
   and?: Array< ModelSmartMeterConditionInput | null > | null,
   or?: Array< ModelSmartMeterConditionInput | null > | null,
   not?: ModelSmartMeterConditionInput | null,
@@ -93,6 +95,7 @@ export type UpdateSmartMeterInput = {
   description?: string | null,
   unit?: MeterUnit | null,
   type?: MeterType | null,
+  role?: string | null,
   meterId?: string | null,
 };
 
@@ -214,6 +217,7 @@ export type ModelSmartMeterFilterInput = {
   description?: ModelStringInput | null,
   unit?: ModelMeterUnitInput | null,
   type?: ModelMeterTypeInput | null,
+  role?: ModelStringInput | null,
   and?: Array< ModelSmartMeterFilterInput | null > | null,
   or?: Array< ModelSmartMeterFilterInput | null > | null,
   not?: ModelSmartMeterFilterInput | null,
@@ -273,6 +277,7 @@ export type CreateSmartMeterMutation = {
     description: string | null,
     unit: MeterUnit,
     type: MeterType,
+    role: string | null,
     profile:  {
       __typename: "LoadProfile",
       id: string,
@@ -287,6 +292,7 @@ export type CreateSmartMeterMutation = {
         description: string | null,
         unit: MeterUnit,
         type: MeterType,
+        role: string | null,
         createdAt: string,
         updatedAt: string,
       },
@@ -312,6 +318,7 @@ export type UpdateSmartMeterMutation = {
     description: string | null,
     unit: MeterUnit,
     type: MeterType,
+    role: string | null,
     profile:  {
       __typename: "LoadProfile",
       id: string,
@@ -326,6 +333,7 @@ export type UpdateSmartMeterMutation = {
         description: string | null,
         unit: MeterUnit,
         type: MeterType,
+        role: string | null,
         createdAt: string,
         updatedAt: string,
       },
@@ -351,6 +359,7 @@ export type DeleteSmartMeterMutation = {
     description: string | null,
     unit: MeterUnit,
     type: MeterType,
+    role: string | null,
     profile:  {
       __typename: "LoadProfile",
       id: string,
@@ -365,6 +374,7 @@ export type DeleteSmartMeterMutation = {
         description: string | null,
         unit: MeterUnit,
         type: MeterType,
+        role: string | null,
         createdAt: string,
         updatedAt: string,
       },
@@ -397,6 +407,7 @@ export type CreateLoadProfileMutation = {
       description: string | null,
       unit: MeterUnit,
       type: MeterType,
+      role: string | null,
       profile:  {
         __typename: "LoadProfile",
         id: string,
@@ -437,6 +448,7 @@ export type UpdateLoadProfileMutation = {
       description: string | null,
       unit: MeterUnit,
       type: MeterType,
+      role: string | null,
       profile:  {
         __typename: "LoadProfile",
         id: string,
@@ -477,6 +489,7 @@ export type DeleteLoadProfileMutation = {
       description: string | null,
       unit: MeterUnit,
       type: MeterType,
+      role: string | null,
       profile:  {
         __typename: "LoadProfile",
         id: string,
@@ -569,6 +582,7 @@ export type GetSmartMeterQuery = {
     description: string | null,
     unit: MeterUnit,
     type: MeterType,
+    role: string | null,
     profile:  {
       __typename: "LoadProfile",
       id: string,
@@ -583,6 +597,7 @@ export type GetSmartMeterQuery = {
         description: string | null,
         unit: MeterUnit,
         type: MeterType,
+        role: string | null,
         createdAt: string,
         updatedAt: string,
       },
@@ -611,6 +626,7 @@ export type ListSmartMetersQuery = {
       description: string | null,
       unit: MeterUnit,
       type: MeterType,
+      role: string | null,
       profile:  {
         __typename: "LoadProfile",
         id: string,
@@ -648,6 +664,7 @@ export type GetLoadProfileQuery = {
       description: string | null,
       unit: MeterUnit,
       type: MeterType,
+      role: string | null,
       profile:  {
         __typename: "LoadProfile",
         id: string,
@@ -691,6 +708,7 @@ export type ListLoadProfilesQuery = {
         description: string | null,
         unit: MeterUnit,
         type: MeterType,
+        role: string | null,
         createdAt: string,
         updatedAt: string,
       },
@@ -754,6 +772,7 @@ export type OnCreateSmartMeterSubscription = {
     description: string | null,
     unit: MeterUnit,
     type: MeterType,
+    role: string | null,
     profile:  {
       __typename: "LoadProfile",
       id: string,
@@ -768,6 +787,7 @@ export type OnCreateSmartMeterSubscription = {
         description: string | null,
         unit: MeterUnit,
         type: MeterType,
+        role: string | null,
         createdAt: string,
         updatedAt: string,
       },
@@ -788,6 +808,7 @@ export type OnUpdateSmartMeterSubscription = {
     description: string | null,
     unit: MeterUnit,
     type: MeterType,
+    role: string | null,
     profile:  {
       __typename: "LoadProfile",
       id: string,
@@ -802,6 +823,7 @@ export type OnUpdateSmartMeterSubscription = {
         description: string | null,
         unit: MeterUnit,
         type: MeterType,
+        role: string | null,
         createdAt: string,
         updatedAt: string,
       },
@@ -822,6 +844,7 @@ export type OnDeleteSmartMeterSubscription = {
     description: string | null,
     unit: MeterUnit,
     type: MeterType,
+    role: string | null,
     profile:  {
       __typename: "LoadProfile",
       id: string,
@@ -836,6 +859,7 @@ export type OnDeleteSmartMeterSubscription = {
         description: string | null,
         unit: MeterUnit,
         type: MeterType,
+        role: string | null,
         createdAt: string,
         updatedAt: string,
       },
@@ -863,6 +887,7 @@ export type OnCreateLoadProfileSubscription = {
       description: string | null,
       unit: MeterUnit,
       type: MeterType,
+      role: string | null,
       profile:  {
         __typename: "LoadProfile",
         id: string,
@@ -898,6 +923,7 @@ export type OnUpdateLoadProfileSubscription = {
       description: string | null,
       unit: MeterUnit,
       type: MeterType,
+      role: string | null,
       profile:  {
         __typename: "LoadProfile",
         id: string,
@@ -933,6 +959,7 @@ export type OnDeleteLoadProfileSubscription = {
       description: string | null,
       unit: MeterUnit,
       type: MeterType,
+      role: string | null,
       profile:  {
         __typename: "LoadProfile",
         id: string,

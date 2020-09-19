@@ -10,6 +10,7 @@ export const onCreateSmartMeter = /* GraphQL */ `
       description
       unit
       type
+      role
       profile {
         id
         name
@@ -22,6 +23,7 @@ export const onCreateSmartMeter = /* GraphQL */ `
           description
           unit
           type
+          role
           createdAt
           updatedAt
         }
@@ -42,6 +44,7 @@ export const onUpdateSmartMeter = /* GraphQL */ `
       description
       unit
       type
+      role
       profile {
         id
         name
@@ -54,6 +57,7 @@ export const onUpdateSmartMeter = /* GraphQL */ `
           description
           unit
           type
+          role
           createdAt
           updatedAt
         }
@@ -74,6 +78,7 @@ export const onDeleteSmartMeter = /* GraphQL */ `
       description
       unit
       type
+      role
       profile {
         id
         name
@@ -86,6 +91,7 @@ export const onDeleteSmartMeter = /* GraphQL */ `
           description
           unit
           type
+          role
           createdAt
           updatedAt
         }
@@ -112,6 +118,7 @@ export const onCreateLoadProfile = /* GraphQL */ `
         description
         unit
         type
+        role
         profile {
           id
           name
@@ -145,6 +152,7 @@ export const onUpdateLoadProfile = /* GraphQL */ `
         description
         unit
         type
+        role
         profile {
           id
           name
@@ -178,6 +186,7 @@ export const onDeleteLoadProfile = /* GraphQL */ `
         description
         unit
         type
+        role
         profile {
           id
           name
