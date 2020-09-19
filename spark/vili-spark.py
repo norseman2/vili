@@ -29,6 +29,11 @@ schema = StructType([
 	StructField('target_value', FloatType(), True)
 ])
 
+spark = (SparkSession
+	.builder
+	.appName("vili-transform")
+	.getOrCreate())
+
 df = spark.read.csv(spark_in, header=True, schema=schema)
 
 shutil.move(spark_out,archive_out)
