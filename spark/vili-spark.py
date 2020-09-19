@@ -19,7 +19,10 @@ def getS3Object(source,target):
 	s3_client = boto3.client('s3')
 	s3_client.download_file(bucket, source, target)
 
-shutil.move(spark_in,archive_in)
+try:
+	shutil.move(spark_in,archive_in)
+except:
+	pass
 getS3Object(s3_source,spark_in)
 '''
 
@@ -36,5 +39,8 @@ spark = (SparkSession
 
 df = spark.read.csv(spark_in, header=True, schema=schema)
 
-shutil.move(spark_out,archive_out)
+try:
+	shutil.move(spark_out,archive_out)
+except:
+	pass
 df.write.format("csv").save(spark_out)
