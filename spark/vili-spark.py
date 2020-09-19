@@ -9,7 +9,7 @@ bucket = 'vili-bucket'
 s3_source='spark/vili-electricity-consumption.csv'
 spark_in='/home/hadoop/data/in/vili-electricity-consumption.csv'
 archive_in='/home/hadoop/data/archives/in/vili-electricity-consumption-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '-UTC.csv'
-spark_out='/home/hadoop/data/out/'
+spark_out='/home/hadoop/data/out/vili-electricity-consumption'
 archive_out='/home/hadoop/data/archives/out/vili-electricity-consumption-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '-UTC.csv'
 s3_archive='forecast/archives/vili-electricity-consumption-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '-UTC.csv'
 s3_target='forecast/vili-electricity-consumption.csv'
@@ -56,7 +56,10 @@ try:
 except:
 	pass
 #write spark dataframe to a csv file
-df.write.format("csv").save(spark_out)
+#df.write.format("csv").save(spark_out)
+df
+  .repartition(1)
+  .write.csv(spark_out)
 #copy previous amazon forecast S3 file
 #copyS3Object(s3_target,s3_archive)
 #push file to S3 for amazon forecast
