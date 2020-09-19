@@ -2,6 +2,7 @@ import boto3
 import shutil
 from datetime import datetime
 
+from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 
 s3_source='spark/vili-electricity-consumption.csv'
