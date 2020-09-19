@@ -1,6 +1,7 @@
 import boto3
 import shutil
 from datetime import datetime
+import os
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
@@ -21,7 +22,7 @@ schema = StructType([
 ])
 
 def getS3Object(source,target):
-	s3_client.download_file(bucket, source, target)
+	
 
 def copyS3Object(source,target):
 	copy_source = { 'Bucket': bucket, 'Key': source }
@@ -39,27 +40,18 @@ try:
 except:
 	pass
 #get new electricity consumption file coming from S3
-getS3Object(s3_source,spark_in)
-
+s3_client.download_file(bucket, source, target)
+#load file to perform some transformation in spark
 spark = (SparkSession
 	.builder
 	.appName("vili-transform")
 	.getOrCreate())
-
-#load file to perform some transformation in spark
 df = spark.read.csv(spark_in, header=True, schema=schema)
-
-#archive previous spark output file
-try:
-	#shutil.move(spark_out,archive_out)
-	pass
-except:
-	pass
-#write spark dataframe to a csv file
-#df.write.format("csv").save(spark_out)
 shutil.rmtree(spark_out)
 df.repartition(1).write.csv(spark_out)
-#copy previous amazon forecast S3 file
-#copyS3Object(s3_target,s3_archive)
-#push file to S3 for amazon forecast
-s3_client.upload_file(spark_out+'/*.csv', bucket, s3_target)
+#put spark output file to S3 for amazon forecast
+spark_out_files = glob.glob(spark_out + "/*.csv")
+for filename in spark_out_files:
+    spark_out = filename
+	break
+s3_client.upload_file(spark_out, bucket, s3_target)
