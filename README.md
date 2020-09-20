@@ -1,3 +1,16 @@
+## forecast
+
+- athena
+- spark (to replace by pandas script and sagemaker processing job + create a cloud formation template 
+for create cluster and launch job with spark)
+- forecast
+create dataset group
+import dataset
+create predictor
+create forecast
+export forecast
+send data to kinesis for athena and redshift (ENoC)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
