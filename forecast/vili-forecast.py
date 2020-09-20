@@ -1,4 +1,5 @@
 import boto3
+import time
 
 session = boto3.Session(region_name='us-east-2') 
 forecast = session.client(service_name='forecast') 
